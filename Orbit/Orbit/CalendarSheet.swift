@@ -72,9 +72,10 @@ struct CalendarSheet: View {
                 } label: {
                     Text("Use these dates")
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Theme.onAccent)
+                        .foregroundStyle(Theme.onPrimary)
                         .frame(maxWidth: .infinity).frame(height: 50)
-                        .background(Capsule().fill(end == nil ? Theme.accent.opacity(0.35) : Theme.accent))
+                        .background(Capsule().fill(Theme.primaryGradient))
+                        .opacity(end == nil ? 0.4 : 1)
                 }
                 .disabled(end == nil)
             }

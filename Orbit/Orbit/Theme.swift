@@ -60,6 +60,17 @@ enum Theme {
     static let sage = Color(light: 0x1C7D69, dark: 0x86CFC0)
     static let sky = Color(light: 0x2F74B5, dark: 0x94BCE3)
     static let shadow = Color(light: 0x1B2331, dark: 0x000000, lightAlpha: 0.10, darkAlpha: 0.40)
+
+    /// Primary action colour: purple → red → yellow. Every main button uses this, in both modes.
+    static let primaryGradient = LinearGradient(
+        gradient: Gradient(stops: [
+            .init(color: Color(hex: 0x6A4CE0), location: 0),
+            .init(color: Color(hex: 0xD6336C), location: 0.55),
+            .init(color: Color(hex: 0xF4B23A), location: 1)
+        ]),
+        startPoint: .topLeading, endPoint: .bottomTrailing)
+    static let onPrimary = Color.white
+    static let primaryGlow = Color(hex: 0xD6336C).opacity(0.30)
 }
 
 /// In-app appearance override (stored with @AppStorage("appearance")).

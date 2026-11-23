@@ -134,7 +134,7 @@ final class GlobeModel {
 
         // Land dots, bucketed by depth for shading
         var buckets = [Path(), Path(), Path(), Path()]
-        let dot = max(1.1, baseR / 210) * 1.15 * sqrt(zoom)
+        let dot = max(1.1, baseR / 210) * 1.15 * sqrt(zoom) * look.dotScale
         for v in land {
             let q = cam.project(v)
             if q.z <= 0.02 { continue }
@@ -274,17 +274,20 @@ private struct GlobeLook {
     let rim: Color, grid: Color
     let land: [Color]
     let airports: Color, planeGlow: Color
+    var dotScale: Double = 1
 
     private static func rgba(_ r: Double, _ g: Double, _ b: Double, _ a: Double) -> Color {
         Color(red: r / 255, green: g / 255, blue: b / 255).opacity(a)
     }
 
+    // Airy light-blue ocean with sea-green land (analogous to the blue; orange route stays the accent).
     static let daylight = GlobeLook(
-        glow: Color(hex: 0x7FAEE6), glowAlpha: 0.30,
-        ocean: [Color(hex: 0xFAFCFF), Color(hex: 0xE3EEF9), Color(hex: 0xC8DBF0)],
-        rim: Color(hex: 0x5A82BE).opacity(0.35), grid: Color(hex: 0x4A6FA5).opacity(0.10),
-        land: [rgba(88, 118, 160, 0.22), rgba(70, 102, 148, 0.42), rgba(55, 88, 135, 0.66), rgba(40, 70, 118, 0.88)],
-        airports: Color(hex: 0xE57F2E).opacity(0.45), planeGlow: Color(hex: 0xE57F2E))
+        glow: Color(hex: 0x9CC3EE), glowAlpha: 0.30,
+        ocean: [Color(hex: 0xFAFDFF).opacity(0.95), Color(hex: 0xE3EFFB).opacity(0.95), Color(hex: 0xC2DAF3).opacity(0.95)],
+        rim: Color(hex: 0x93B7E0).opacity(0.65), grid: Color(hex: 0x6F98C8).opacity(0.12),
+        land: [rgba(52, 141, 115, 0.78), rgba(42, 126, 101, 0.90), rgba(34, 114, 90, 0.97), rgba(28, 105, 82, 1.0)],
+        airports: Color(hex: 0xE57F2E).opacity(0.45), planeGlow: Color(hex: 0xE57F2E),
+        dotScale: 1.22)
 
     static let dusk = GlobeLook(
         glow: Color(hex: 0x82A5DC), glowAlpha: 0.16,

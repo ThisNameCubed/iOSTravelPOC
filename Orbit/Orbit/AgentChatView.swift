@@ -106,9 +106,10 @@ struct AgentChatView: View {
                     Button { send(text) } label: {
                         Image(systemName: "arrow.up")
                             .font(.system(size: 17, weight: .bold))
-                            .foregroundStyle(Theme.onAccent)
+                            .foregroundStyle(Theme.onPrimary)
                             .frame(width: 46, height: 46)
-                            .background(Circle().fill(Theme.accent))
+                            .background(Circle().fill(Theme.primaryGradient))
+                            .shadow(color: Theme.primaryGlow, radius: 8, y: 4)
                     }
                     .accessibilityLabel("Send")
                 }
@@ -175,9 +176,9 @@ struct AgentChatView: View {
                     Text(c.price).font(.display(14)).foregroundStyle(Theme.text)
                     Spacer()
                     Button { planIt(c.code) } label: {
-                        Text("Plan it").font(.system(size: 13, weight: .semibold)).foregroundStyle(Theme.onAccent)
+                        Text("Plan it").font(.system(size: 13, weight: .semibold)).foregroundStyle(Theme.onPrimary)
                             .padding(.horizontal, 12).frame(height: 34)
-                            .background(Capsule().fill(Theme.accent))
+                            .background(Capsule().fill(Theme.primaryGradient))
                     }
                 }
                 .padding(.top, 8)

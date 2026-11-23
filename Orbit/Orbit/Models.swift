@@ -75,7 +75,7 @@ enum BookingMode: String, CaseIterable, Identifiable {
 
     var placeholder: String {
         switch self {
-        case .flights: return "Fly to — Tokyo, Lisbon, CPT"
+        case .flights: return "Ask me where to — Tokyo, Lisbon…"
         case .stays: return "Stay in — city or neighborhood"
         case .cars: return "Pick up in — city or airport"
         case .packages: return "Flight + hotel — where to?"

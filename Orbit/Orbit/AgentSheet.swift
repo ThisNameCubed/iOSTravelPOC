@@ -398,9 +398,10 @@ struct Dock: View {
                 Button { store.goHome() } label: {
                     Text("Plan another trip")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Theme.onAccent)
+                        .foregroundStyle(Theme.onPrimary)
                         .frame(maxWidth: .infinity).frame(height: 50)
-                        .background(Capsule().fill(Theme.accent))
+                        .background(Capsule().fill(Theme.primaryGradient))
+                        .shadow(color: Theme.primaryGlow, radius: 8, y: 4)
                 }
             } else {
                 ScrollView(.horizontal) {
@@ -436,9 +437,10 @@ struct Dock: View {
                         Button { store.next() } label: {
                             Text(store.stage == .review ? "Book \(Fmt.money(store.totals.total))" : "Next · \(Fmt.money(store.totals.total))")
                                 .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(Theme.onAccent)
+                                .foregroundStyle(Theme.onPrimary)
                                 .padding(.horizontal, 18).frame(height: 44)
-                                .background(Capsule().fill(Theme.accent))
+                                .background(Capsule().fill(Theme.primaryGradient))
+                                .shadow(color: Theme.primaryGlow, radius: 8, y: 4)
                                 .fixedSize()
                         }
                     }

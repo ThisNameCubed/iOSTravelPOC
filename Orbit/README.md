@@ -16,7 +16,7 @@ Select the **Orbit** target → *Signing & Capabilities* → choose your **Team*
 change the bundle identifier if Xcode asks (e.g. `com.yourname.orbit`), plug in your phone and Run.
 
 ## Light & dark mode
-Orbit follows the iPhone's Light/Dark setting. To override it, open **Trips** and use the appearance menu (top right): Match iPhone, Light or Dark. Light mode is the bright daylight look; dark mode is the dusk look. Both use the dotted globe.
+Orbit follows the iPhone's Light/Dark setting. To override it, open **Trips** and use the appearance menu (top right): Match iPhone, Light or Dark. Light mode is the bright daylight look (airy light-blue globe with sea-green land); dark mode is the dusk look. Both use the dotted globe. Main buttons (search arrow, Next/Book, Use these dates, Send, Plan it) share one purple → red → yellow gradient in both modes.
 
 ## Requirements
 - iOS 17+ (uses the Observation framework).
