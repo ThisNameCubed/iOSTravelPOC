@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TripsView: View {
     @State private var tab = 0
+    @AppStorage("appearance") private var appearance: Appearance = .system
 
     var body: some View {
         ScrollView {
@@ -46,7 +47,21 @@ struct TripsView: View {
         .navigationTitle("Trips")
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.bg, for: .navigationBar)
-        .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Picker("Appearance", selection: $appearance) {
+                        ForEach(Appearance.allCases) { a in
+                            Label(a.title, systemImage: a.icon).tag(a)
+                        }
+                    }
+                } label: {
+                    Image(systemName: appearance.icon)
+                        .foregroundStyle(Theme.text)
+                }
+                .accessibilityLabel("Appearance: \(appearance.title)")
+            }
+        }
     }
 }
 

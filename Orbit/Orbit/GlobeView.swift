@@ -23,6 +23,9 @@ final class GlobeModel {
 
     private let land = LandMask.points
     private let airportDots = Airports.all.map { Geo.vec($0.lat, $0.lon) }
+    private let stars: [(x: Double, y: Double, s: Double, a: Double)] = (0..<140).map { _ in
+        (Double.random(in: 0...1), Double.random(in: 0...1), Double.random(in: 0.3...1.5), Double.random(in: 0...1))
+    }
 
     static func now() -> Double { Date().timeIntervalSinceReferenceDate * 1000 }
 
@@ -77,7 +80,7 @@ final class GlobeModel {
 
     // MARK: Drawing
 
-    func draw(_ c: inout GraphicsContext, size: CGSize, t: Double, trip: Bool, accent: Color) {
+    func draw(_ c: inout GraphicsContext, size: CGSize, t: Double, trip: Bool, dark: Bool, accent: Color) {
         let dt = min(64, max(0, t - lastT))
         lastT = t
         if let a = anim {
@@ -98,16 +101,26 @@ final class GlobeModel {
         let R = baseR * zoom
         let cam = Camera(cl: cos(Geo.rad(lon)), sl: sin(Geo.rad(lon)), cp: cos(Geo.rad(lat)), sp: sin(Geo.rad(lat)), r: R, cx: cx, cy: cy)
 
-        // Daylight atmosphere and a pale, glassy ocean
-        let glow = Color(hex: 0x7FAEE6)
+        let look = dark ? GlobeLook.dusk : GlobeLook.daylight
+
+        // Stars only at night
+        if dark {
+            let starColor = Color(red: 0.78, green: 0.84, blue: 1)
+            for (i, s) in stars.enumerated() {
+                let a = 0.08 + 0.3 * s.a * (0.6 + 0.4 * sin(t / 900 + Double(i)))
+                c.fill(Path(CGRect(x: s.x * W, y: s.y * H, width: s.s, height: s.s)), with: .color(starColor.opacity(a)))
+            }
+        }
+
+        // Atmosphere and ocean
         c.fill(Path(ellipseIn: CGRect(x: cx - R * 1.32, y: cy - R * 1.32, width: R * 2.64, height: R * 2.64)),
-               with: .radialGradient(Gradient(colors: [glow.opacity(0.30), glow.opacity(0)]),
+               with: .radialGradient(Gradient(colors: [look.glow.opacity(look.glowAlpha), look.glow.opacity(0)]),
                                      center: CGPoint(x: cx, y: cy), startRadius: R * 0.9, endRadius: R * 1.32))
         let sphere = Path(ellipseIn: CGRect(x: cx - R, y: cy - R, width: 2 * R, height: 2 * R))
-        c.fill(sphere, with: .radialGradient(Gradient(colors: [Color(hex: 0xFAFCFF), Color(hex: 0xE3EEF9), Color(hex: 0xC8DBF0)]),
+        c.fill(sphere, with: .radialGradient(Gradient(colors: look.ocean),
                                              center: CGPoint(x: cx - R * 0.35, y: cy - R * 0.4),
                                              startRadius: R * 0.05, endRadius: R * 1.1))
-        c.stroke(sphere, with: .color(Color(hex: 0x5A82BE).opacity(0.35)), lineWidth: 1)
+        c.stroke(sphere, with: .color(look.rim), lineWidth: 1)
 
         // Graticule
         var grid = Path()
@@ -117,7 +130,7 @@ final class GlobeModel {
         for lo in stride(from: -180.0, to: 180.0, by: 30.0) {
             addLine(&grid, cam, count: 73) { k in Geo.vec(-90 + Double(k) * 2.5, lo) }
         }
-        c.stroke(grid, with: .color(Color(hex: 0x4A6FA5).opacity(0.10)), lineWidth: 1)
+        c.stroke(grid, with: .color(look.grid), lineWidth: 1)
 
         // Land dots, bucketed by depth for shading
         var buckets = [Path(), Path(), Path(), Path()]
@@ -129,10 +142,8 @@ final class GlobeModel {
             let s = dot * (0.65 + Double(b) * 0.14)
             buckets[b].addRect(CGRect(x: q.x - s / 2, y: q.y - s / 2, width: s, height: s))
         }
-        let shades: [(Double, Double, Double, Double)] = [(88, 118, 160, 0.22), (70, 102, 148, 0.42), (55, 88, 135, 0.66), (40, 70, 118, 0.88)]
         for (i, p) in buckets.enumerated() {
-            let s = shades[i]
-            c.fill(p, with: .color(Color(red: s.0 / 255, green: s.1 / 255, blue: s.2 / 255).opacity(s.3)))
+            c.fill(p, with: .color(look.land[i]))
         }
 
         // Known airports
@@ -141,10 +152,10 @@ final class GlobeModel {
             let q = cam.project(v)
             if q.z > 0.05 { ap.addEllipse(in: CGRect(x: q.x - 1.6, y: q.y - 1.6, width: 3.2, height: 3.2)) }
         }
-        c.fill(ap, with: .color(Theme.route.opacity(0.45)))
+        c.fill(ap, with: .color(look.airports))
 
         // Route
-        if let o = origin, let d = dest, showArc { drawArc(&c, cam, from: o, to: d, t: t, accent: accent) }
+        if let o = origin, let d = dest, showArc { drawArc(&c, cam, from: o, to: d, t: t, accent: accent, glow: look.planeGlow) }
 
         // Home airport
         if let o = origin {
@@ -193,7 +204,7 @@ final class GlobeModel {
         }
     }
 
-    private func drawArc(_ c: inout GraphicsContext, _ cam: Camera, from o: Airport, to d: Airport, t: Double, accent: Color) {
+    private func drawArc(_ c: inout GraphicsContext, _ cam: Camera, from o: Airport, to d: Airport, t: Double, accent: Color, glow: Color) {
         let A = Geo.vec(o.lat, o.lon), B = Geo.vec(d.lat, d.lon)
         let om = acos(max(-1, min(1, (A * B).sum())))
         if om < 0.001 { return }
@@ -236,7 +247,7 @@ final class GlobeModel {
             let pt = pts[min(n, Int(ph * Double(n)))]
             if pt.vis {
                 c.fill(circle(pt.p.x, pt.p.y, 9),
-                       with: .radialGradient(Gradient(colors: [accent.opacity(0.9), accent.opacity(0)]),
+                       with: .radialGradient(Gradient(colors: [glow.opacity(0.9), glow.opacity(0)]),
                                              center: pt.p, startRadius: 0, endRadius: 9))
             }
         }
@@ -256,14 +267,42 @@ final class GlobeModel {
     }
 }
 
+/// The two globe looks. Same dotted style; only the palette changes.
+private struct GlobeLook {
+    let glow: Color, glowAlpha: Double
+    let ocean: [Color]
+    let rim: Color, grid: Color
+    let land: [Color]
+    let airports: Color, planeGlow: Color
+
+    private static func rgba(_ r: Double, _ g: Double, _ b: Double, _ a: Double) -> Color {
+        Color(red: r / 255, green: g / 255, blue: b / 255).opacity(a)
+    }
+
+    static let daylight = GlobeLook(
+        glow: Color(hex: 0x7FAEE6), glowAlpha: 0.30,
+        ocean: [Color(hex: 0xFAFCFF), Color(hex: 0xE3EEF9), Color(hex: 0xC8DBF0)],
+        rim: Color(hex: 0x5A82BE).opacity(0.35), grid: Color(hex: 0x4A6FA5).opacity(0.10),
+        land: [rgba(88, 118, 160, 0.22), rgba(70, 102, 148, 0.42), rgba(55, 88, 135, 0.66), rgba(40, 70, 118, 0.88)],
+        airports: Color(hex: 0xE57F2E).opacity(0.45), planeGlow: Color(hex: 0xE57F2E))
+
+    static let dusk = GlobeLook(
+        glow: Color(hex: 0x82A5DC), glowAlpha: 0.16,
+        ocean: [Color(hex: 0x22314C), Color(hex: 0x1A263A), Color(hex: 0x141C2A)],
+        rim: Color(hex: 0xA0B9E1).opacity(0.25), grid: Color(hex: 0x96AAD2).opacity(0.07),
+        land: [rgba(150, 170, 205, 0.2), rgba(165, 185, 215, 0.38), rgba(185, 200, 225, 0.58), rgba(214, 224, 238, 0.85)],
+        airports: Color(hex: 0xF0D7B4).opacity(0.45), planeGlow: .white)
+}
+
 struct GlobeView: View {
     let model: GlobeModel
     let trip: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         TimelineView(.animation) { timeline in
             Canvas { context, size in
-                model.draw(&context, size: size, t: timeline.date.timeIntervalSinceReferenceDate * 1000, trip: trip, accent: Theme.route)
+                model.draw(&context, size: size, t: timeline.date.timeIntervalSinceReferenceDate * 1000, trip: trip, dark: colorScheme == .dark, accent: Theme.route)
             }
         }
         .contentShape(Rectangle())

@@ -3,12 +3,13 @@ import SwiftUI
 @main
 struct OrbitApp: App {
     @State private var store = TripStore()
+    @AppStorage("appearance") private var appearance: Appearance = .system
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environment(store)
-                .preferredColorScheme(.light)
+                .preferredColorScheme(appearance.colorScheme)
                 .tint(Theme.accent)
         }
     }
