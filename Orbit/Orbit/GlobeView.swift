@@ -279,11 +279,12 @@ private struct GlobeLook {
         Color(red: r / 255, green: g / 255, blue: b / 255).opacity(a)
     }
 
+    // Mid-blue ocean with deep-navy land for stronger contrast on the light background.
     static let daylight = GlobeLook(
-        glow: Color(hex: 0x7FAEE6), glowAlpha: 0.30,
-        ocean: [Color(hex: 0xFAFCFF), Color(hex: 0xE3EEF9), Color(hex: 0xC8DBF0)],
-        rim: Color(hex: 0x5A82BE).opacity(0.35), grid: Color(hex: 0x4A6FA5).opacity(0.10),
-        land: [rgba(88, 118, 160, 0.22), rgba(70, 102, 148, 0.42), rgba(55, 88, 135, 0.66), rgba(40, 70, 118, 0.88)],
+        glow: Color(hex: 0x6E9FDC), glowAlpha: 0.34,
+        ocean: [Color(hex: 0xDCE9F7), Color(hex: 0xA8C6E8), Color(hex: 0x6D96C9)],
+        rim: Color(hex: 0x3F6AA6).opacity(0.55), grid: Color(hex: 0x2F5A96).opacity(0.12),
+        land: [rgba(36, 62, 104, 0.40), rgba(28, 54, 96, 0.62), rgba(22, 46, 86, 0.82), rgba(16, 38, 76, 0.96)],
         airports: Color(hex: 0xE57F2E).opacity(0.45), planeGlow: Color(hex: 0xE57F2E))
 
     static let dusk = GlobeLook(
