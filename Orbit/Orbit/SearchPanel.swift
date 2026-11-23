@@ -40,9 +40,10 @@ struct SearchPanel: View {
 
             // Search field
             HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 17, weight: .medium))
-                    .foregroundStyle(Theme.muted)
+                Image(systemName: "sparkle")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(Theme.primaryGradient)
+                    .accessibilityHidden(true)
                 TextField("", text: $store.query, prompt: Text(store.mode.placeholder).foregroundColor(Theme.faint))
                     .font(.system(size: 17))
                     .foregroundStyle(Theme.text)
@@ -63,9 +64,10 @@ struct SearchPanel: View {
                 Button { go() } label: {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(Theme.onAccent)
+                        .foregroundStyle(Theme.onPrimary)
                         .frame(width: 44, height: 44)
-                        .background(Circle().fill(Theme.accent))
+                        .background(Circle().fill(Theme.primaryGradient))
+                        .shadow(color: Theme.primaryGlow, radius: 8, y: 4)
                 }
                 .accessibilityLabel("Go")
             }
