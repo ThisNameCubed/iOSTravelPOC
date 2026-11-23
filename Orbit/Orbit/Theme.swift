@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 extension Color {
     init(hex: UInt32, opacity: Double = 1) {
@@ -10,36 +11,82 @@ extension Color {
     }
 }
 
-/// Bright "daylight" palette — airy surfaces, apricot accent, deep teal for home/live.
-enum Theme {
-    static let bg = Color(hex: 0xF3F5F9)
-    static let surface = Color(hex: 0xFFFFFF)
-    static let surface2 = Color(hex: 0xF7F8FB)
-    static let surface3 = Color(hex: 0xEEF1F6)
-    static let chip = Color(hex: 0xEAF0F7)
-    static let userBubble = Color(hex: 0xE2ECF8)
-    static let border = Color(hex: 0xDCE2EB)
-    static let borderSoft = Color(hex: 0xE7EBF1)
-    static let handle = Color(hex: 0xC9D1DD)
+extension UIColor {
+    convenience init(hex: UInt32, alpha: CGFloat = 1) {
+        self.init(red: CGFloat((hex >> 16) & 0xFF) / 255,
+                  green: CGFloat((hex >> 8) & 0xFF) / 255,
+                  blue: CGFloat(hex & 0xFF) / 255,
+                  alpha: alpha)
+    }
+}
 
-    static let text = Color(hex: 0x1B2331)
-    static let text2 = Color(hex: 0x2B3444)
-    static let text3 = Color(hex: 0x3F4959)
-    static let soft = Color(hex: 0x4F5A6B)
-    static let muted = Color(hex: 0x636D7E)
-    static let faint = Color(hex: 0x7C8696)
-    static let disabled = Color(hex: 0xA9B1BD)
+extension Color {
+    /// A colour that follows the current appearance (Light / Dark).
+    init(light: UInt32, dark: UInt32, lightAlpha: CGFloat = 1, darkAlpha: CGFloat = 1) {
+        self.init(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark ? UIColor(hex: dark, alpha: darkAlpha) : UIColor(hex: light, alpha: lightAlpha)
+        })
+    }
+}
+
+/// Light mode: bright "daylight". Dark mode: soft "dusk". Every colour adapts automatically.
+enum Theme {
+    static let bg = Color(light: 0xF3F5F9, dark: 0x121925)
+    static let surface = Color(light: 0xFFFFFF, dark: 0x19212F)
+    static let surface2 = Color(light: 0xF7F8FB, dark: 0x1D2636)
+    static let surface3 = Color(light: 0xEEF1F6, dark: 0x212B3C)
+    static let chip = Color(light: 0xEAF0F7, dark: 0x253043)
+    static let userBubble = Color(light: 0xE2ECF8, dark: 0x2A3650)
+    static let border = Color(light: 0xDCE2EB, dark: 0x2E394C)
+    static let borderSoft = Color(light: 0xE7EBF1, dark: 0x2A3446)
+    static let handle = Color(light: 0xC9D1DD, dark: 0x3A4660)
+
+    static let text = Color(light: 0x1B2331, dark: 0xE3E7EE)
+    static let text2 = Color(light: 0x2B3444, dark: 0xD3D9E2)
+    static let text3 = Color(light: 0x3F4959, dark: 0xC3CAD5)
+    static let soft = Color(light: 0x4F5A6B, dark: 0xAAB2BF)
+    static let muted = Color(light: 0x636D7E, dark: 0x9AA3B1)
+    static let faint = Color(light: 0x7C8696, dark: 0x8C95A4)
+    static let disabled = Color(light: 0xA9B1BD, dark: 0x6E7889)
 
     /// Fill colour for buttons, pins and highlights.
-    static let accent = Color(hex: 0xF59E4C)
-    static let accentLight = Color(hex: 0xFBC48F)
-    /// Darker apricot for accent-coloured text on light surfaces (meets 4.5:1).
-    static let accentInk = Color(hex: 0xB2541A)
+    static let accent = Color(light: 0xF59E4C, dark: 0xE9B676)
+    static let accentLight = Color(light: 0xFBC48F, dark: 0xF2CE9E)
+    /// Accent-coloured text (meets 4.5:1 on its surface in both modes).
+    static let accentInk = Color(light: 0xB2541A, dark: 0xE9B676)
     /// Route line and destination pin on the globe.
-    static let route = Color(hex: 0xE57F2E)
-    static let onAccent = Color(hex: 0x3A1C05)
-    static let sage = Color(hex: 0x1C7D69)
-    static let sky = Color(hex: 0x2F74B5)
+    static let route = Color(light: 0xE57F2E, dark: 0xE9B676)
+    static let onAccent = Color(light: 0x3A1C05, dark: 0x2B1F10)
+    static let sage = Color(light: 0x1C7D69, dark: 0x86CFC0)
+    static let sky = Color(light: 0x2F74B5, dark: 0x94BCE3)
+    static let shadow = Color(light: 0x1B2331, dark: 0x000000, lightAlpha: 0.10, darkAlpha: 0.40)
+}
+
+/// In-app appearance override (stored with @AppStorage("appearance")).
+enum Appearance: String, CaseIterable, Identifiable {
+    case system, light, dark
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .system: return "Match iPhone"
+        case .light: return "Light"
+        case .dark: return "Dark"
+        }
+    }
+    var icon: String {
+        switch self {
+        case .system: return "circle.lefthalf.filled"
+        case .light: return "sun.max"
+        case .dark: return "moon"
+        }
+    }
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
 }
 
 extension Font {

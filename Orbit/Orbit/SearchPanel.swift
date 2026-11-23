@@ -73,7 +73,7 @@ struct SearchPanel: View {
             .frame(height: 60)
             .background(Capsule().fill(Theme.surface2.opacity(0.96)))
             .overlay(Capsule().strokeBorder(focused ? Theme.accent : Theme.border, lineWidth: 1))
-            .shadow(color: Color(hex: 0x1B2331).opacity(0.10), radius: 18, y: 8)
+            .shadow(color: Theme.shadow, radius: 18, y: 8)
 
             if store.customDep != nil && !focused {
                 HStack {

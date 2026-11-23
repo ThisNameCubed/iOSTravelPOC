@@ -122,7 +122,6 @@ struct AgentChatView: View {
         .navigationTitle("Trip Agent")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.bg, for: .navigationBar)
-        .toolbarColorScheme(.light, for: .navigationBar)
     }
 
     @ViewBuilder
