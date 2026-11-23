@@ -48,7 +48,7 @@ struct AgentSheet: View {
         .background(
             UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous)
                 .fill(Theme.surface)
-                .shadow(color: Color(hex: 0x1B2331).opacity(0.10), radius: 24, y: -6)
+                .shadow(color: Theme.shadow, radius: 24, y: -6)
                 .ignoresSafeArea(edges: .bottom)
         )
     }
